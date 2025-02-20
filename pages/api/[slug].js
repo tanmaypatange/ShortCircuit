@@ -1,29 +1,23 @@
 import { connectToDB } from '../lib/db'
 
 export default function SlugRedirect() {
-  return null // React component placeholder
+  return null
 }
 
 export async function getServerSideProps(context) {
   const { slug } = context.params
   const { db } = await connectToDB()
 
-  // Case-insensitive search with hexadecimal validation
-  const urlDoc = await db.collection('urls').findOne({ 
-    $or: [
-      { slug: slug.toLowerCase() },
-      { slug: { $regex: new RegExp(`^${slug}$`, 'i') }}
-    ]
-  })
+  const entry = await db.collection('urls').findOne({ slug })
 
-  if (!urlDoc) {
-    return { notFound: true } // Returns 404 if not found
+  if (!entry || !entry.url) {
+    return { notFound: true }
   }
 
   return {
     redirect: {
-      permanent: false,
-      destination: urlDoc.url
+      destination: entry.url,
+      permanent: false
     }
   }
 }
