@@ -1,26 +1,34 @@
-import { MongoClient } from 'mongodb'
+import { connectToDB } from '../../utils/mongodb'
 
 export default async function handler(req, res) {
-  const client = new MongoClient(process.env.MONGODB_URI)
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const { slug, url } = req.body
+  
+  // Validate input
+  if (!slug || !url) {
+    return res.status(400).json({ error: 'Both slug and URL are required' })
+  }
+
+  const { db } = await connectToDB()
   
   try {
-    await client.connect()
-    const collection = client.db('urls').collection('mappings')
-
-    if (req.method === 'POST') {
-      const { slug, url } = req.body
-      await collection.insertOne({ slug, url, createdAt: new Date() })
-      return res.status(201).json({ success: true })
+    const existingDoc = await db.collection('mappings').findOne({ slug })
+    if (existingDoc) {
+      return res.status(400).json({ error: 'Slug already exists' })
     }
 
-    if (req.method === 'GET') {
-      const docs = await collection.find().toArray()
-      return res.json(docs)
-    }
+    await db.collection('mappings').insertOne({
+      slug,
+      url: url.startsWith('http') ? url : `https://${url}`,
+      createdAt: new Date()
+    })
 
+    res.status(200).json({ success: true, slug })
   } catch (error) {
-    return res.status(500).json({ error: error.message })
-  } finally {
-    await client.close()
+    console.error('API error:', error)
+    res.status(500).json({ error: error.message })
   }
 }
