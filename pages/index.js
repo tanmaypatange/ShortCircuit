@@ -12,7 +12,7 @@ export default function Home() {
     setError('')
     
     try {
-      // CALL CORRECT ENDPOINT
+      // Changed endpoint from 'shorten' to 'create'
       const response = await fetch('/api/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -30,5 +30,11 @@ export default function Home() {
     }
   }
 
-  /* UI CODE REMAINS SAME AS BEFORE */
+  return (
+    <div className="container">
+      <h1>Auto-Shorten URLs</h1>
+      <form onSubmit={handleSubmit}>
+        {/* REST OF UI CODE REMAINS THE SAME */}
+    </div>
+  )
 }
