@@ -1,13 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "package.json", "use": "@vercel/next" }
-  ],
-  "redirects": [
-    {
-      "source": "/github",
-      "destination": "https://github.com",
-      "permanent": true
+  "builds": [ { "src": "package.json", "use": "@vercel/next" } ],
+  "rewrites": [ 
+    { 
+      "source": "/:slug", 
+      "destination": "/api/:slug" 
     }
   ]
 }
