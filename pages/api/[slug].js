@@ -1,16 +1,26 @@
-import { connectToDB } from '../lib/db'
+import { connectToDB } from '../../lib/db'
 
-export default function SlugRedirect() { return null }
+export default function SlugRedirect() {
+  return null
+}
 
 export async function getServerSideProps({ params }) {
   try {
     const db = await connectToDB()
-    const entry = await db.collection('urls').findOne({ slug: params.slug })
-    return entry?.url 
-      ? { redirect: { destination: entry.url, permanent: false }}
-      : { notFound: true }
+    const urlData = await db.collection('urls').findOne({ slug: params.slug }, {
+      projection: { _id: 0, url: 1 }
+    })
+
+    if (!urlData) return { notFound: true }
+
+    return {
+      redirect: {
+        destination: urlData.url,
+        permanent: false
+      }
+    }
   } catch (error) {
-    console.error('Critical redirect failure:', error)
+    console.error('REDIRECT FATAL:', error)
     return { notFound: true }
   }
 }
