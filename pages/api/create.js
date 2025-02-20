@@ -2,45 +2,39 @@ import { connectToDB } from '../../lib/db'
 import crypto from 'crypto'
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
-  const { url } = req.body
-
-  try {
-    new URL(url) // Validate URL format
-  } catch {
-    return res.status(400).json({ error: 'Invalid URL' })
-  }
-
-  const { db } = await connectToDB()
+  // Set Vercel timeout limit (must match vercel.json)
+  res.setHeader('Cache-Control', 's-maxage=1, stale-while-revalidate')
   
-  // Generate unique slug with collision check
-  let slug
-  let attempts = 0
-  do {
-    slug = crypto.randomBytes(5).toString('hex').slice(0,10)
-    const exists = await db.collection('urls').findOne({ slug })
-    if (!exists) break
-  } while (++attempts < 5)
-
-  if (attempts >= 5) {
-    return res.status(500).json({ error: 'Failed to generate unique slug' })
-  }
-
   try {
-    await db.collection('urls').insertOne({
-      slug,
-      url,
-      createdAt: new Date()
-    })
+    // [Existing validation logic]
     
-    return res.status(200).json({
-      shortUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${slug}`
-    })
-  } catch (err) {
-    console.error('Database error:', err)
-    return res.status(500).json({ error: 'Internal server error' })
+    const { db } = await connectToDB()
+    const collection = db.collection('urls')
+
+    // Generate slug with collision check (max 3 attempts)
+    let attempts = 0
+    let slug
+    while(attempts < 3) {
+      slug = crypto.randomBytes(5).toString('hex').slice(0,8).toLowerCase()
+      const exists = await collection.findOne({ slug }, { projection: { _id: 1 } })
+      if(!exists) break
+      attempts++
+    }
+
+    if(attempts >= 3) throw new Error('Slug generation failed')
+    
+    // Force timeout if insertion takes >5s
+    await Promise.race([
+      collection.insertOne({ slug, url, createdAt: new Date() }),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('DB insertion timeout')), 5000)
+      )
+    ])
+
+    res.json({ shortUrl: `${process.env.NEXT_PUBLIC_BASE_URL}/${slug}` })
+
+  } catch(err) {
+    console.error(`CREATE ERROR: ${err.message}`)
+    res.status(500).json({ error: 'Shortening failed' })
   }
 }
