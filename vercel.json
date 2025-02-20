@@ -5,3 +5,12 @@
     { "source": "/:slug", "destination": "/api/:slug" }
   ]
 }
+
+{
+  "functions": {
+    "pages/api/*.js": {
+      "maxDuration": 15
+    }
+  },
+  "regions": ["iad1"] // Same as MongoDB cluster region
+}
