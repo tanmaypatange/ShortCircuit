@@ -1,9 +1,7 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/(.+)", "destination": "/" }
-  ],
-  "redirects": [
-    { "source": "/api/create", "destination": "/api/create", "permanent": false }
-  ]
+  "builds": [{
+    "src": "package.json",
+    "use": "@vercel/next"
+  }]
 }
