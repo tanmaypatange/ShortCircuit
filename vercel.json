@@ -1,8 +1,9 @@
 {
   "version": 2,
-  "functions": {
-    "pages/api/**/*.js": {
-      "maxDuration": 30
-    }
-  }
+  "rewrites": [
+    { "source": "/(.+)", "destination": "/" }
+  ],
+  "redirects": [
+    { "source": "/api/create", "destination": "/api/create", "permanent": false }
+  ]
 }
