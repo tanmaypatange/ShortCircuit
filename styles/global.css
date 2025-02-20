@@ -1,10 +1,13 @@
 :root {
-  --primary: #0066ff;
-  --primary-hover: #0052cc;
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --success: #22c55e;
+  --error: #ef4444;
   --background: #f8fafc;
-  --card-bg: white;
+  --card-bg: #ffffff;
   --text: #1e293b;
   --border: #e2e8f0;
+  --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -13,26 +16,60 @@
   box-sizing: border-box;
 }
 
+html {
+  font-size: 16px;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 body {
-  background: var(--background);
-  font-family: 'Segoe UI', system-ui, sans-serif;
-  color: var(--text);
+  background: linear-gradient(135deg, var(--background) 0%, #f1f5f9 100%);
+  min-height: 100vh;
+  padding: 2rem;
 }
 
 .container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 2rem;
+  max-width: 680px;
+  margin: 0 auto;
   background: var(--card-bg);
-  border-radius: 16px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-radius: 1.5rem;
+  padding: 3rem;
+  box-shadow: var(--shadow);
 }
 
-h1 {
+.header {
   text-align: center;
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  color: var(--primary);
+  margin-bottom: 2.5rem;
+}
+
+.logo-gradient {
+  background: linear-gradient(135deg, var(--primary), #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.beta-badge {
+  background: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  vertical-align: super;
+  margin-left: 0.5rem;
+}
+
+.tagline {
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.form-card {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin: 1rem 0;
 }
 
 .input-group {
@@ -41,99 +78,121 @@ h1 {
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  color: #475569;
   font-weight: 500;
-  color: #64748b;
+  margin-bottom: 0.5rem;
 }
 
-input[type="text"],
-input[type="url"] {
+input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.875rem;
   border: 2px solid var(--border);
-  border-radius: 8px;
+  border-radius: 0.75rem;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 input:focus {
-  outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  outline: none;
 }
 
-.submit-btn {
+.input-hint {
+  display: block;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-top: 0.5rem;
+}
+
+.cta-button {
   width: 100%;
   background: var(--primary);
   color: white;
-  padding: 0.75rem;
+  padding: 1rem;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 0.75rem;
   font-weight: 600;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.submit-btn:hover {
+.cta-button:hover {
   background: var(--primary-hover);
 }
 
-.error {
-  color: #dc2626;
+.error-card {
   background: #fee2e2;
-  padding: 0.75rem;
-  border-radius: 8px;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: 0.75rem;
   margin: 1rem 0;
   text-align: center;
 }
 
-.result {
+.result-card {
+  background: #f8fafc;
+  border-radius: 1rem;
+  padding: 2rem;
   margin-top: 2rem;
-  background: #f1f5f9;
-  padding: 1.5rem;
-  border-radius: 12px;
+  animation: slideIn 0.3s ease;
 }
 
-.result p {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #64748b;
-}
-
-.url-display {
+.success-header {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
-.url-display input {
+.success-header svg {
+  color: var(--success);
+}
+
+.url-container {
+  display: flex;
+  gap: 1rem;
+}
+
+.url-container input {
   flex: 1;
-  padding: 0.75rem;
-  border: 2px solid var(--border);
-  border-radius: 8px;
   background: white;
-  font-size: 0.9rem;
-  color: var(--text);
 }
 
-.copy-btn {
+.copy-button {
   background: var(--primary);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: 0 1.5rem;
+  border-radius: 0.75rem;
   cursor: pointer;
   transition: background 0.2s;
+  white-space: nowrap;
 }
 
-.copy-btn:hover {
+.copy-button:hover {
   background: var(--primary-hover);
 }
 
-@media (max-width: 640px) {
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
   .container {
-    margin: 1rem;
     padding: 1.5rem;
+    border-radius: 1rem;
+  }
+
+  body {
+    padding: 1rem;
   }
 }
