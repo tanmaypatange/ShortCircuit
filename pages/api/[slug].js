@@ -1,16 +1,16 @@
-import { connectToDB } from '../lib/db'
+import { connectToDB } from '../../lib/db'
 
-export default function SlugRedirect() {
-  return null
+export default function SlugRedirect() { 
+  return null 
 }
 
 export async function getServerSideProps(context) {
   const { slug } = context.params
-  const { db } = await connectToDB()
-
+  const db = await connectToDB()
+  
   const entry = await db.collection('urls').findOne({ slug })
 
-  if (!entry || !entry.url) {
+  if (!entry) {
     return { notFound: true }
   }
 
