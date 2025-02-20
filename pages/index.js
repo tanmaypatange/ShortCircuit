@@ -3,48 +3,81 @@ import { useState } from 'react'
 export default function Home() {
   const [slug, setSlug] = useState('')
   const [url, setUrl] = useState('')
+  const [shortenedUrl, setShortenedUrl] = useState('')
+  const [error, setError] = useState('')
 
-  const submit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    const response = await fetch('/api/urls', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug, url })
-    })
-    if (response.ok) {
-      alert(`Short URL created: ${window.location.origin}/${slug}`)
-    } else {
-      alert('Error creating short URL')
+    
+    // Input validation
+    if (!slug || !url) {
+      setError('Short Path and Long URL are required.')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/urls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, url }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Failed to create URL')
+
+      // Display generated URL on page
+      setShortenedUrl(`${window.location.origin}/${data.slug}`)
+      setError('')
+    } catch (err) {
+      setError(err.message)
     }
   }
 
   return (
-    <div style={{ margin: '2rem', fontFamily: 'Arial' }}>
+    <div className="container">
       <h1>URL Shortener</h1>
-      <form onSubmit={submit}>
-        <input
-          type="text"
-          placeholder="Short path (e.g. 'github')"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          required
-          style={{ display: 'block', margin: '10px 0', padding: '8px', width: '300px' }}
-        />
-        <input
-          type="url"
-          placeholder="Long URL (https://example.com)"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          required
-          style={{ display: 'block', margin: '10px 0', padding: '8px', width: '300px' }}
-        />
-        <button
-          type="submit"
-          style={{ background: 'blue', color: 'white', padding: '10px', border: 'none' }}
-        >
-          Create Short URL
-        </button>
+      <form onSubmit={handleSubmit}>
+        <div className="input-group">
+          <label>Short Path</label>
+          <input
+            type="text"
+            placeholder="e.g., 'github'"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+          />
+        </div>
+        <div className="input-group">
+          <label>Long URL</label>
+          <input
+            type="url"
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+        </div>
+        {error && <p className="error">{error}</p>}
+        <button type="submit" className="submit-btn">Create Short URL</button>
       </form>
+
+      {shortenedUrl && (
+        <div className="result">
+          <p>Shortened URL:</p>
+          <div className="url-display">
+            <input
+              type="text"
+              value={shortenedUrl}
+              readOnly
+              onClick={(e) => e.target.select()}
+            />
+            <button
+              onClick={() => navigator.clipboard.writeText(shortenedUrl)}
+              className="copy-btn"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
