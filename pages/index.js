@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 export default function Home() {
-  const [url, setUrl] = useState('')
+  const [originalUrl, setOriginalUrl] = useState('')
   const [shortUrl, setShortUrl] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -12,10 +12,10 @@ export default function Home() {
     setError('')
     
     try {
-      const response = await fetch('/api/create', {
+      const response = await fetch('/api/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
+        body: JSON.stringify({ url: originalUrl })
       })
 
       if (!response.ok) {
@@ -34,30 +34,32 @@ export default function Home() {
 
   return (
     <div className="container">
-      <h1>URL Shortener</h1>
+      <h1>Auto-Shorten URLs</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="url"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          value={originalUrl}
+          onChange={(e) => setOriginalUrl(e.target.value)}
           placeholder="Enter long URL"
           required
           autoFocus
         />
         <button type="submit" disabled={loading}>
-          {loading ? 'Shortening...' : 'Shorten URL'}
+          {loading ? 'Generating...' : 'Create Short URL'}
         </button>
         
         {error && <div className="error">{error}</div>}
         
         {shortUrl && (
           <div className="result">
-            <p>Your shortened URL:</p>
             <input
               type="text"
               value={shortUrl}
               readOnly
-              onClick={(e) => e.target.select()}
+              onClick={(e) => {
+                e.target.select()
+                navigator.clipboard.writeText(shortUrl)
+              }}
             />
           </div>
         )}
