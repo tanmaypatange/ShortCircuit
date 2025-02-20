@@ -1,22 +1,29 @@
-import { MongoClient } from 'mongodb'
+import { connectToDB } from '../lib/db'
 
-export default async function handler(req, res) {
-  const client = new MongoClient(process.env.MONGODB_URI)
-  const { slug } = req.query
+export default function SlugRedirect() {
+  return null // React component placeholder
+}
 
-  try {
-    await client.connect()
-    const doc = await client.db('urls').collection('mappings')
-      .findOne({ slug })
+export async function getServerSideProps(context) {
+  const { slug } = context.params
+  const { db } = await connectToDB()
 
-    if (doc) {
-      res.redirect(302, doc.url)
-    } else {
-      res.status(404).json({ error: 'URL not found' })
+  // Case-insensitive search with hexadecimal validation
+  const urlDoc = await db.collection('urls').findOne({ 
+    $or: [
+      { slug: slug.toLowerCase() },
+      { slug: { $regex: new RegExp(`^${slug}$`, 'i') }}
+    ]
+  })
+
+  if (!urlDoc) {
+    return { notFound: true } // Returns 404 if not found
+  }
+
+  return {
+    redirect: {
+      permanent: false,
+      destination: urlDoc.url
     }
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' })
-  } finally {
-    await client.close()
   }
 }
