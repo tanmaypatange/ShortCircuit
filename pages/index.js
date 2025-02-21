@@ -10,9 +10,9 @@ export default function Home() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     try {
-      const response = await fetch('/api/create', {
+      const response = await fetch('/api/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: originalUrl })
@@ -34,26 +34,33 @@ export default function Home() {
 
   return (
     <div className="container">
-      <h1>URL Shortener</h1>
+      <h1>Auto-Shorten URLs</h1>
       <form onSubmit={handleSubmit}>
         <input
           type="url"
           value={originalUrl}
           onChange={(e) => setOriginalUrl(e.target.value)}
-          placeholder="Enter full URL (e.g., https://example.com)"
+          placeholder="Enter long URL"
           required
+          autoFocus
         />
         <button type="submit" disabled={loading}>
-          {loading ? 'Generating...' : 'Shorten'}
+          {loading ? 'Generating...' : 'Create Short URL'}
         </button>
-        
-        {error && <p className="error">Error: {error}</p>}
-        
+
+        {error && <div className="error">{error}</div>}
+
         {shortUrl && (
           <div className="result">
-            <a href={shortUrl} target="_blank" rel="noopener noreferrer">
-              {shortUrl}
-            </a>
+            <input
+              type="text"
+              value={shortUrl}
+              readOnly
+              onClick={(e) => {
+                e.target.select()
+                navigator.clipboard.writeText(shortUrl)
+              }}
+            />
           </div>
         )}
       </form>
