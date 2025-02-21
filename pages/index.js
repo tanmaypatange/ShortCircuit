@@ -38,7 +38,7 @@ export default function Home() {
     <div className="container">
       <header className="header">
         <h1>
-          <span className="logo-gradient">Short.ly</span>
+          <span className="logo-gradient">ShortCircuit</span>
           <span className="beta-badge">BETA</span>
         </h1>
         <p className="tagline">Modern URL Shortening for the Web</p>
